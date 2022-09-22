@@ -64,6 +64,8 @@ export enum ContractAddressId {
   zapperZapOut = "ZAPPER_ZAP_OUT",
   portalsZapIn = "PORTALS_ZAP_IN",
   portalsZapOut = "PORTALS_ZAP_OUT",
+  widoZapIn = "WIDO_ZAP_OUT",
+  widoZapOut = "WIDO_ZAP_OUT",
   pickleZapIn = "PICKLE_ZAP_IN",
   propertiesAggregator = "PROPERTIES_AGGREGATOR",
   unused = "UNUSED",

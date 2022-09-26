@@ -764,7 +764,7 @@ export class SimulationInterface<T extends ChainId> extends ServiceInterface<T> 
     } else if (zapOutWith === "widoZapOut") {
       zapOutPromise = this.yearn.services.wido.zapOut(fromVault, zapToken, amount, from, options.slippage);
     } else {
-      throw new Error("zapInWith not supported");
+      throw new Error("zapOutWith not supported");
     }
 
     const zapOutParams = await zapOutPromise.catch(() => {

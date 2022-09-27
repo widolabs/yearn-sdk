@@ -30,7 +30,7 @@ export class WidoService extends Service {
           dataSource: "wido",
           supported: {
             widoZapIn: true,
-            widoZapOut: SUPPORTED_ZAP_OUT_TOKEN_SYMBOLS.includes(token.symbol.toUpperCase()), // TODO: add native token for multichain zaps
+            widoZapOut: SUPPORTED_ZAP_OUT_TOKEN_SYMBOLS.includes(token.symbol.toUpperCase()),
           },
           symbol: token.symbol,
         };

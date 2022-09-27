@@ -624,7 +624,7 @@ export class VaultInterface<T extends ChainId> extends ServiceInterface<T> {
   }
 
   private async zapIn(
-    toVault: Address,
+    vaultAddr: Address,
     token: Address,
     amount: Integer,
     account: Address,
@@ -634,10 +634,10 @@ export class VaultInterface<T extends ChainId> extends ServiceInterface<T> {
   ): Promise<TransactionRequest> {
     if (options.slippage === undefined) throw new SdkError("zap operations should have a slippage set");
 
-    const [vault] = await this.get([toVault]);
+    const [vault] = await this.get([vaultAddr]);
 
     if (!vault) {
-      throw new SdkError(`Could not get vault: ${toVault}`);
+      throw new SdkError(`Could not get vault: ${vaultAddr}`);
     }
 
     const { zapInWith } = vault.metadata;
@@ -646,7 +646,7 @@ export class VaultInterface<T extends ChainId> extends ServiceInterface<T> {
 
     if (zapInWith === "portalsZapIn") {
       zapInPromise = this.yearn.services.portals.zapIn(
-        toVault,
+        vaultAddr,
         token,
         amount,
         account,
@@ -655,7 +655,7 @@ export class VaultInterface<T extends ChainId> extends ServiceInterface<T> {
         this.yearn.services.partner?.partnerId
       );
     } else if (zapInWith === "widoZapIn") {
-      zapInPromise = this.yearn.services.wido.zapIn(toVault, token, amount, account, options.slippage);
+      zapInPromise = this.yearn.services.wido.zapIn(vaultAddr, token, amount, account, options.slippage);
     } else {
       throw new Error("zapInWith not supported");
     }
@@ -777,7 +777,7 @@ export class VaultInterface<T extends ChainId> extends ServiceInterface<T> {
   }
 
   async populateWithdrawTransaction({
-    vault: toVault,
+    vault: vaultAddr,
     token,
     amount,
     account,
@@ -792,18 +792,18 @@ export class VaultInterface<T extends ChainId> extends ServiceInterface<T> {
     overrides: CallOverrides;
   }): Promise<TransactionRequest> {
     const signer = this.ctx.provider.write.getSigner(account);
-    const isUnderlyingToken = await this.isUnderlyingToken(toVault, token);
+    const isUnderlyingToken = await this.isUnderlyingToken(vaultAddr, token);
     if (isUnderlyingToken) {
-      const vaultContract = new Contract(toVault, VaultAbi, signer);
+      const vaultContract = new Contract(vaultAddr, VaultAbi, signer);
       return await vaultContract.populateTransaction.withdraw(amount, overrides);
     }
 
     if (options.slippage === undefined) throw new SdkError("zap operations should have a slippage set");
 
-    const [vault] = await this.get([toVault]);
+    const [vault] = await this.get([vaultAddr]);
 
     if (!vault) {
-      throw new SdkError(`Could not get vault: ${toVault}`);
+      throw new SdkError(`Could not get vault: ${vaultAddr}`);
     }
 
     const { zapOutWith } = vault.metadata;
@@ -811,7 +811,7 @@ export class VaultInterface<T extends ChainId> extends ServiceInterface<T> {
     let zapOutPromise;
     if (zapOutWith === "portalsZapOut") {
       zapOutPromise = this.yearn.services.portals.zapOut(
-        toVault,
+        vaultAddr,
         token,
         amount,
         account,
@@ -820,7 +820,7 @@ export class VaultInterface<T extends ChainId> extends ServiceInterface<T> {
         options.signature
       );
     } else if (zapOutWith === "widoZapOut") {
-      zapOutPromise = this.yearn.services.wido.zapOut(toVault, token, amount, account, options.slippage);
+      zapOutPromise = this.yearn.services.wido.zapOut(vaultAddr, token, amount, account, options.slippage);
     } else {
       throw new Error("zapOutWith not supported");
     }

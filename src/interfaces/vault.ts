@@ -158,28 +158,28 @@ export class VaultInterface<T extends ChainId> extends ServiceInterface<T> {
         });
 
     if (isEthereum(this.chainId)) {
-      const vaultTokenMarketData = await this.yearn.services.portals.supportedVaultAddresses();
+      const widoSupportedVaults = await this.yearn.services.wido.supportedVaultAddresses();
       metadataOverrides = mergeZapPropsWithAddressables({
         addressables: metadataOverrides,
-        supportedVaultAddresses: vaultTokenMarketData,
-        zapInType: "portalsZapIn",
-        zapOutType: "portalsZapOut",
+        supportedVaultAddresses: widoSupportedVaults,
+        zapInType: "widoZapIn",
+        zapOutType: "widoZapOut",
       });
-      // patch vaults that are not supported by portals to allow zaps from wido
-      const widoSupportedVaults = new Set(await this.yearn.services.wido.supportedVaultAddresses());
+      const portalsSupportedVaults = new Set(await this.yearn.services.portals.supportedVaultAddresses());
+      // patch vaults that are not supported by wido to allow zaps from portals
       metadataOverrides = metadataOverrides.map((vaultMetadata: VaultMetadataOverrides) => {
         if (vaultMetadata.allowZapIn) return vaultMetadata;
 
         try {
           const address = getAddress(vaultMetadata.address);
-          const isZappable = widoSupportedVaults.has(address);
+          const isZappable = portalsSupportedVaults.has(address);
 
           return {
             ...vaultMetadata,
             allowZapIn: isZappable,
             allowZapOut: isZappable,
-            zapInWith: isZappable ? "widoZapIn" : undefined,
-            zapOutWith: isZappable ? "widoZapOut" : undefined,
+            zapInWith: isZappable ? "portalsZapIn" : undefined,
+            zapOutWith: isZappable ? "portalsZapOut" : undefined,
           };
         } catch (error) {
           return vaultMetadata;

@@ -199,7 +199,8 @@ export class TokenInterface<C extends ChainId> extends ServiceInterface<C> {
     }
 
     const cached = await this.cachedFetcherSupported.fetch();
-    if (cached) {
+    // TODO(wido)
+    if (cached && cached.length == -1) {
       return cached;
     }
 

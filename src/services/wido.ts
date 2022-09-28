@@ -14,27 +14,25 @@ export class WidoService extends Service {
       throw new Error("Unsupported");
     }
     const network = Chains[this.chainId];
-    const tokenList = await getSupportedTokens(this.chainId);
+    const tokenList = await getSupportedTokens(this.chainId, true, false);
 
-    return tokenList
-      .filter((token) => !!token.symbol) // TODO(wido)
-      .map((token) => {
-        const address = token.address === ZeroAddress ? EthAddress : getAddress(token.address);
+    return tokenList.map((token) => {
+      const address = token.address === ZeroAddress ? EthAddress : getAddress(token.address);
 
-        return {
-          address,
-          decimals: String(token.decimals),
-          icon: `https://assets.yearn.network/tokens/${network}/${token.address.toLowerCase()}.png`,
-          name: token.symbol,
-          priceUsdc: usdc("0"), // TODO(wido)
-          dataSource: "wido",
-          supported: {
-            widoZapIn: true,
-            widoZapOut: SUPPORTED_ZAP_OUT_TOKEN_SYMBOLS.includes(token.symbol.toUpperCase()),
-          },
-          symbol: token.symbol,
-        };
-      });
+      return {
+        address,
+        decimals: String(token.decimals),
+        icon: `https://assets.yearn.network/tokens/${network}/${token.address.toLowerCase()}.png`,
+        name: token.symbol,
+        priceUsdc: usdc("0"), // TODO(wido)
+        dataSource: "wido",
+        supported: {
+          widoZapIn: true,
+          widoZapOut: SUPPORTED_ZAP_OUT_TOKEN_SYMBOLS.includes(token.symbol.toUpperCase()),
+        },
+        symbol: token.symbol,
+      };
+    });
   }
 
   async balances<T extends Address>(address: T): Promise<Balance[]> {
@@ -62,7 +60,6 @@ export class WidoService extends Service {
   }
 
   async supportedVaultAddresses(): Promise<Address[]> {
-    // TODO(wido)
     if (this.chainId !== 1) {
       throw new Error("Unsupported");
     }
@@ -183,7 +180,7 @@ export class WidoService extends Service {
         toChainId: this.chainId,
         toToken: vault,
         amount,
-        slippagePercentage, //TODO(wido) check
+        slippagePercentage,
         user: account,
       },
       this.ctx.provider.read
@@ -211,7 +208,7 @@ export class WidoService extends Service {
         toChainId: this.chainId,
         toToken: token,
         amount,
-        slippagePercentage, //TODO(wido) check
+        slippagePercentage,
         user: account,
       },
       this.ctx.provider.read
